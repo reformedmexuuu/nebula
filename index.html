@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f1c2a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Nebula Casino</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="logo" href="#/"><span class="logo-mark">N</span><span class="logo-text">nebula</span></a>
+      <nav class="nav" id="nav"></nav>
+      <div class="sidebar-foot">Tryb demo · wirtualne środki</div>
+    </aside>
+    <div class="nav-backdrop" onclick="document.body.classList.remove('nav-open')"></div>
+
+    <div class="main">
+      <header class="topbar">
+        <button type="button" class="icon-btn menu-btn" id="menuBtn" aria-label="Menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <a class="topbar-logo" href="#/" aria-label="Lobby"><span class="logo-mark">N</span></a>
+        <div class="wallet-box">
+          <span class="wallet-balance" id="balance" title="Kliknij, aby edytować saldo">$0.00</span>
+          <button type="button" class="btn btn-primary btn-sm" id="walletBtn">Portfel</button>
+        </div>
+        <div class="topbar-right">
+          <button type="button" class="icon-btn stats-btn" id="statsBtn" title="Live stats">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>
+            <span class="hide-sm">Live stats</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="view" id="view"></main>
+
+      <section class="bets-section">
+        <h3 id="betsTitle">Moje zakłady</h3>
+        <div class="table-wrap">
+          <table class="bets-table">
+            <thead><tr><th>Gra</th><th>Czas</th><th>Zakład</th><th>Mnożnik</th><th>Wynik</th></tr></thead>
+            <tbody id="betsBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="walletModal">
+    <div class="modal" role="dialog" aria-labelledby="walletTitle">
+      <div class="modal-head">
+        <h3 id="walletTitle">Portfel</h3>
+        <button type="button" class="icon-btn sm" data-close-modal aria-label="Zamknij">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="wallet-current"><span class="muted">Aktualne saldo</span><b id="walletCurrent">$0.00</b></div>
+        <div class="field">
+          <label class="field-label" for="walletInput"><span>Ustaw saldo</span></label>
+          <div class="bet-input">
+            <div class="input-wrap"><span class="input-prefix">$</span><input type="number" id="walletInput" min="0" step="0.01"></div>
+            <button type="button" class="btn btn-primary" id="walletSet">Ustaw</button>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-secondary" data-add="100">+ $100</button>
+          <button type="button" class="btn btn-secondary" data-add="1000">+ $1,000</button>
+          <button type="button" class="btn btn-secondary" data-add="10000">+ $10,000</button>
+        </div>
+        <button type="button" class="btn btn-secondary wide" id="walletReset">Przywróć saldo startowe</button>
+        <button type="button" class="btn btn-ghost wide" id="statsReset">Wyczyść statystyki i historię zakładów</button>
+        <p class="muted small">Saldo startowe na stałe zmienisz w pliku <code>js/config.js</code> (<code>startingBalance</code>).</p>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav" id="bottomNav" aria-label="Gry"></nav>
+
+  <div id="toasts"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/games/dice.js"></script>
+  <script src="js/games/keno.js"></script>
+  <script src="js/games/mines.js"></script>
+  <script src="js/games/plinko.js"></script>
+  <script src="js/games/blackjack.js"></script>
+  <script src="js/games/moles.js"></script>
+  <script src="js/livestats.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
