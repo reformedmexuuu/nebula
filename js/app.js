@@ -60,6 +60,11 @@
     current = game;
     if (game && game.instance.onShow) game.instance.onShow();
     $$('.nav-item, .bn-item').forEach((a) => a.classList.toggle('active', a.dataset.route === (game ? game.id : '')));
+    // dolny pasek się przewija — pokaż aktywną grę
+    const activeBn = $('.bn-item.active', bottomNav);
+    if (activeBn && bottomNav.scrollWidth > bottomNav.clientWidth) {
+      bottomNav.scrollLeft = activeBn.offsetLeft - bottomNav.clientWidth / 2 + activeBn.offsetWidth / 2;
+    }
     document.title = (game ? game.name + ' · ' : '') + 'Nebula Casino';
     document.body.classList.remove('nav-open');
     renderBets();

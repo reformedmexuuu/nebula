@@ -458,6 +458,92 @@ svg { display: block; }
 .hole-miss { position: absolute; left: 0; right: 0; bottom: 18%; text-align: center; font-size: 26px; font-weight: 900; color: var(--red); opacity: 0; text-shadow: 0 2px 4px rgba(0,0,0,.6); }
 .hole.missed .hole-miss { opacity: 1; animation: popUp 0.25s ease-out; }
 
+/* ---------- Limbo ---------- */
+.limbo-stage { justify-content: space-between; }
+.limbo-display { position: relative; flex: 1; display: grid; place-items: center; min-height: 260px; }
+.limbo-number {
+  font-size: clamp(56px, 9vw, 110px); font-weight: 800; letter-spacing: -1px;
+  font-variant-numeric: tabular-nums; color: #fff; transition: color 0.15s;
+}
+.limbo-number.win { color: var(--green); }
+.limbo-number.lose { color: var(--red); }
+.limbo-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--panel-2); padding: 14px; border-radius: 12px; }
+
+/* ---------- Ruletka ---------- */
+.rl-stage { gap: 14px; }
+.rl-wheel-wrap { display: flex; justify-content: center; }
+.rl-wheel { position: relative; width: 230px; aspect-ratio: 1; }
+.rl-rotor { position: absolute; inset: 0; will-change: transform; }
+.rl-rotor svg { width: 100%; height: 100%; filter: drop-shadow(0 8px 18px rgba(0,0,0,.45)); }
+.rl-rotor text { font-family: Inter, system-ui, sans-serif; }
+.rl-pointer {
+  position: absolute; left: 50%; top: -6px; transform: translateX(-50%);
+  width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 18px solid var(--yellow);
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.5));
+}
+.rl-center {
+  position: absolute; inset: 34%; border-radius: 50%; display: grid; place-items: center;
+  background: var(--panel-2); border: 3px solid var(--panel-3); font-weight: 800; font-size: 26px;
+  transition: background 0.2s;
+}
+.rl-center.red { background: #e5243e; border-color: #ff6b80; animation: popUp 0.3s ease-out; }
+.rl-center.black { background: #1b2633; border-color: #4a6684; animation: popUp 0.3s ease-out; }
+.rl-center.green { background: #1fa85b; border-color: #5ee39a; animation: popUp 0.3s ease-out; }
+.pill.rl-red { background: #e5243e; color: #fff; }
+.pill.rl-black { background: #1b2633; color: #fff; box-shadow: inset 0 0 0 1px #3d5a78; }
+.pill.rl-green { background: #1fa85b; color: #fff; }
+
+.rl-board-wrap { width: 100%; max-width: 820px; margin: 0 auto; }
+.rl-board {
+  display: grid; gap: 4px;
+  grid-template-columns: 0.9fr repeat(12, 1fr) 0.9fr;
+  grid-template-rows: repeat(3, 44px) 38px 38px;
+}
+.rl-cell {
+  grid-row: var(--gr); grid-column: var(--gc);
+  position: relative; border: 0; border-radius: 6px; cursor: pointer;
+  display: grid; place-items: center; font-weight: 800; font-size: 14px; color: #fff;
+  background: var(--panel-3); transition: filter 0.12s, box-shadow 0.12s;
+  min-width: 0; padding: 0;
+}
+.rl-cell.num.red { background: #e5243e; }
+.rl-cell.num.black { background: #1b2633; box-shadow: inset 0 0 0 1px #2e4258; }
+.rl-cell.num.green { background: #1fa85b; }
+.rl-cell.out { background: var(--panel-2); box-shadow: inset 0 0 0 1px var(--line); font-size: 12.5px; }
+.rl-cell.swatch.red::before, .rl-cell.swatch.black::before {
+  content: ''; width: 22px; height: 22px; transform: rotate(45deg); border-radius: 3px;
+}
+.rl-cell.swatch.red::before { background: #e5243e; }
+.rl-cell.swatch.black::before { background: #1b2633; box-shadow: 0 0 0 1px #4a6684; }
+.rl-cell .rl-label { grid-area: 1 / 1; }
+.rl-cell.swatch .rl-label { display: none; }
+@media (hover: hover) {
+  .rl-board:not(.locked) .rl-cell:hover, .rl-cell.hl { filter: brightness(1.3); }
+}
+.rl-board.locked .rl-cell { cursor: default; }
+.rl-board .rl-cell.hit { box-shadow: 0 0 0 3px var(--yellow), 0 0 16px var(--yellow); z-index: 1; }
+.rl-board .rl-cell.win { box-shadow: 0 0 0 3px var(--green), 0 0 14px rgba(31,220,122,.6); z-index: 1; }
+.rl-board .rl-cell.hit.win { box-shadow: 0 0 0 3px var(--yellow), 0 0 0 6px var(--green); }
+.rl-chip {
+  position: absolute; z-index: 2; pointer-events: none;
+  min-width: 26px; height: 26px; padding: 0 4px; border-radius: 999px;
+  display: grid; place-items: center; font-size: 10.5px; font-weight: 800; color: #fff;
+  border: 2px dashed rgba(255,255,255,.75); box-shadow: 0 2px 6px rgba(0,0,0,.5);
+  animation: tilePop 0.2s ease-out;
+}
+.rl-chips { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.rl-chip-btn {
+  aspect-ratio: 1; border-radius: 50%; border: 3px dashed rgba(255,255,255,.7); cursor: pointer;
+  font-weight: 800; font-size: 12px; color: #fff; padding: 0; transition: transform 0.12s;
+}
+.rl-chip-btn.active { transform: scale(1.12); box-shadow: 0 0 0 3px var(--panel-2), 0 0 0 5px var(--green); }
+.c0 { background: #5b8cff; }
+.c1 { background: #8b5cff; }
+.c2 { background: #e5243e; }
+.c3 { background: #1fa85b; }
+.c4 { background: #f08a1c; }
+.c5 { background: #c9a227; color: #2a1c00; }
+
 /* ---------- Live stats ---------- */
 .ls-window {
   position: fixed; z-index: 50; width: 320px;
@@ -632,3 +718,30 @@ svg { display: block; }
   .toast { max-width: 100%; }
 }
 @keyframes sheetIn { from { transform: translateY(100%); } }
+
+/* Ruletka: na wąskich ekranach plansza obrócona pionowo (5 kolumn × 14 rzędów) */
+@media (max-width: 640px) {
+  .rl-board {
+    grid-template-columns: 0.85fr 0.85fr 1fr 1fr 1fr;
+    grid-template-rows: repeat(14, 36px);
+    max-width: 360px; margin: 0 auto; gap: 3px;
+  }
+  .rl-cell { grid-row: var(--vgr); grid-column: var(--vgc); font-size: 13px; }
+  .rl-cell.out .rl-label { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 11.5px; }
+  .rl-cell[data-key^="col"] .rl-label { writing-mode: horizontal-tb; transform: none; }
+  .rl-cell.swatch.red::before, .rl-cell.swatch.black::before { width: 18px; height: 18px; }
+  .rl-chip { min-width: 24px; height: 24px; font-size: 10px; }
+  .rl-wheel { width: 170px; }
+  /* przycisk obrotu przypięty nad dolnym paskiem, żeby nie przewijać pod planszę */
+  .rl-spin {
+    position: fixed; left: 14px; right: 14px; width: auto; z-index: 35;
+    bottom: calc(var(--bn-h, 0px) + env(safe-area-inset-bottom) + 10px);
+    box-shadow: 0 8px 24px rgba(0,0,0,.55);
+  }
+  body:has(.game-page:not(.hidden) .rl-spin) { padding-bottom: calc(var(--bn-h, 0px) + env(safe-area-inset-bottom) + 72px); }
+  .rl-board-wrap { padding-bottom: 8px; }
+  .rl-center { font-size: 22px; }
+  .limbo-display { min-height: 170px; }
+  .limbo-number { font-size: 56px; }
+  .limbo-inputs { grid-template-columns: 1fr 1fr; padding: 10px; gap: 10px; }
+}
