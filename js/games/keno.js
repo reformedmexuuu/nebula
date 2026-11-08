@@ -3,14 +3,56 @@
   const { el, $, $$, r2, sleep, wallet, ui } = App;
 
   const N = 40, DRAW = 10, MAX_PICKS = 10;
+  // Tabele wypłat: klucz = liczba wybranych pól, wartości = mnożnik dla 0..n trafień (RTP ~99%)
   const RISKS = {
-    low: { label: 'Niskie', g: 0.35, t: (n) => Math.floor(n * 0.3), soft: 50, cap: 500 },
-    classic: { label: 'Klasyczne', g: 0.5, t: (n) => Math.ceil(n * 0.35), soft: 100, cap: 1000 },
-    medium: { label: 'Średnie', g: 0.7, t: (n) => Math.ceil(n * 0.45), soft: 200, cap: 3000 },
+    classic: {
+      label: 'Klasyczne',
+      table: {
+        1: [0, 3.96],
+        2: [0, 1.9, 4.5],
+        3: [0, 1, 3.1, 10.4],
+        4: [0, 0.8, 1.8, 5, 22.5],
+        5: [0, 0.25, 1.4, 4.1, 16.5, 36],
+        6: [0, 0, 1, 3.68, 7, 16.5, 40],
+        7: [0, 0, 0.47, 3, 4.5, 14, 31, 60],
+        8: [0, 0, 0, 2.2, 4, 13, 22, 55, 70],
+        9: [0, 0, 0, 1.55, 3, 8, 15, 44, 60, 85],
+        10: [0, 0, 0, 1.4, 2.25, 4.5, 8, 17, 50, 80, 100],
+      },
+    },
+    low: {
+      label: 'Niskie',
+      table: {
+        1: [0.7, 1.85],
+        2: [0, 2, 3.8],
+        3: [0, 1.1, 1.38, 26],
+        4: [0, 0, 2.2, 7.9, 90],
+        5: [0, 0, 1.5, 4.2, 13, 300],
+        6: [0, 0, 1.1, 2, 6.2, 100, 700],
+        7: [0, 0, 1.1, 1.6, 3.5, 15, 225, 700],
+        8: [0, 0, 1.1, 1.5, 2, 5.5, 39, 100, 800],
+        9: [0, 0, 1.1, 1.3, 1.7, 2.5, 7.5, 50, 250, 1000],
+        10: [0, 0, 1.1, 1.2, 1.3, 1.8, 3.5, 13, 50, 250, 1000],
+      },
+    },
+    medium: {
+      label: 'Średnie',
+      table: {
+        1: [0.4, 2.75],
+        2: [0, 1.8, 5.1],
+        3: [0, 0, 2.8, 50],
+        4: [0, 0, 1.7, 10, 100],
+        5: [0, 0, 1.4, 4, 14, 390],
+        6: [0, 0, 0, 3, 9, 180, 710],
+        7: [0, 0, 0, 2, 7, 30, 400, 800],
+        8: [0, 0, 0, 2, 4, 11, 67, 400, 900],
+        9: [0, 0, 0, 2, 2.5, 5, 15, 100, 500, 1000],
+        10: [0, 0, 0, 1.6, 2, 4, 7, 26, 100, 500, 1000],
+      },
+    },
     high: {
       label: 'Wysokie',
-      // stała tabela: indeks = liczba wybranych pól, wartości = mnożnik dla 0..n trafień (RTP ~99%)
-      fixed: {
+      table: {
         1: [0, 3.96],
         2: [0, 0, 17.1],
         3: [0, 0, 0, 81.5],
@@ -38,18 +80,7 @@
       const picks = new Set();
       let drawn = new Set();
       let busy = false;
-      const cache = {};
-
-      function table(n) {
-        const key = risk + n;
-        if (!cache[key]) {
-          const r = RISKS[risk];
-          if (r.fixed) return (cache[key] = r.fixed[n]);
-          const probs = [...Array(n + 1)].map((_, k) => (App.comb(n, k) * App.comb(N - n, DRAW - k)) / App.comb(N, DRAW));
-          cache[key] = App.rarityTable(probs, { g: r.g, eligible: (k) => k >= r.t(n), soft: r.soft, cap: r.cap });
-        }
-        return cache[key];
-      }
+      const table = (n) => RISKS[risk].table[n];
 
       const { panel, stage } = ui.gameLayout(root, 'keno-stage');
       const tabs = ui.modeTabs((m) => { auto.node.classList.toggle('hidden', m !== 'auto'); updateButton(); });

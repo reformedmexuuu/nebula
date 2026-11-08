@@ -2,10 +2,18 @@
   'use strict';
   const { el, r2, wallet, ui } = App;
 
-  const RISKS = {
-    low: { label: 'Niskie', g: 0.3, cap: 50 },
-    medium: { label: 'Średnie', g: 0.55, cap: 300 },
-    high: { label: 'Wysokie', g: 0.9, cap: 1000 },
+  const RISKS = { low: 'Niskie', medium: 'Średnie', high: 'Wysokie' };
+  // Lewa połowa tabel wypłat (od krawędzi do środka), RTP ~99%; prawa połowa to lustro
+  const HALF = {
+    8: { low: [5.6, 2.1, 1.1, 1, 0.5], medium: [13, 3, 1.3, 0.7, 0.4], high: [29, 4, 1.5, 0.3, 0.2] },
+    9: { low: [5.6, 2, 1.6, 1, 0.7], medium: [18, 4, 1.7, 0.9, 0.5], high: [43, 7, 2, 0.6, 0.2] },
+    10: { low: [8.9, 3, 1.4, 1.1, 1, 0.5], medium: [22, 5, 2, 1.4, 0.6, 0.4], high: [76, 10, 3, 0.9, 0.3, 0.2] },
+    11: { low: [8.4, 3, 1.9, 1.3, 1, 0.7], medium: [24, 6, 3, 1.8, 0.7, 0.5], high: [120, 14, 5.2, 1.4, 0.4, 0.2] },
+    12: { low: [10, 3, 1.6, 1.4, 1.1, 1, 0.5], medium: [33, 11, 4, 2, 1.1, 0.6, 0.3], high: [170, 24, 8.1, 2, 0.7, 0.2, 0.2] },
+    13: { low: [8.1, 4, 3, 1.9, 1.2, 0.9, 0.7], medium: [43, 13, 6, 3, 1.3, 0.7, 0.4], high: [260, 37, 11, 4, 1, 0.2, 0.2] },
+    14: { low: [7.1, 4, 1.9, 1.4, 1.3, 1.1, 1, 0.5], medium: [58, 15, 7, 4, 1.9, 1, 0.5, 0.2], high: [420, 56, 18, 5, 1.9, 0.3, 0.2, 0.2] },
+    15: { low: [15, 8, 3, 2, 1.5, 1.1, 1, 0.7], medium: [88, 18, 11, 5, 3, 1.3, 0.5, 0.3], high: [620, 83, 27, 8, 3, 0.5, 0.2, 0.2] },
+    16: { low: [16, 9, 2, 1.4, 1.4, 1.2, 1.1, 1, 0.5], medium: [110, 41, 10, 5, 3, 1.5, 1, 0.5, 0.3], high: [1000, 130, 26, 9, 4, 2, 0.2, 0.2, 0.2] },
   };
   const SEG_MS = 95;     // czas przelotu między rzędami kołków
   const DROP_MS = 180;   // pierwszy spadek na górny kołek
@@ -40,8 +48,9 @@
       function table(n = rows, rk = risk) {
         const key = rk + n;
         if (!cache[key]) {
-          const probs = [...Array(n + 1)].map((_, i) => App.comb(n, i) / 2 ** n);
-          cache[key] = App.rarityTable(probs, { g: RISKS[rk].g, cap: RISKS[rk].cap });
+          const h = HALF[n][rk];
+          // parzysta liczba rzędów ma środkowy kubełek, więc nie powtarzamy go w lustrze
+          cache[key] = h.concat((n % 2 === 0 ? h.slice(0, -1) : h).reverse());
         }
         return cache[key];
       }
@@ -49,7 +58,7 @@
       const { panel, stage } = ui.gameLayout(root, 'plinko-stage');
       const tabs = ui.modeTabs((m) => { auto.node.classList.toggle('hidden', m !== 'auto'); updateButton(); });
       const bet = ui.betControl();
-      const riskSel = ui.selectField('Ryzyko', Object.entries(RISKS).map(([k, v]) => [k, v.label]), risk);
+      const riskSel = ui.selectField('Ryzyko', Object.entries(RISKS), risk);
       const rowsSel = ui.selectField('Rzędy', [8, 9, 10, 11, 12, 13, 14, 15, 16].map((n) => [n, n]), rows);
       const auto = ui.autobet({ bet, play: playOnce, delay: 260, onState: lock });
       auto.node.classList.add('hidden');

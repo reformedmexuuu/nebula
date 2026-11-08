@@ -427,36 +427,46 @@ svg { display: block; }
 .rung.done { background: #14402b; color: var(--green); }
 .rung.current { background: var(--panel-3); outline: 2px solid var(--green); }
 .moles-status { text-align: center; font-weight: 700; color: #c4d2e0; }
-.moles-field {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 4% 6%;
-  max-width: 520px; width: 100%; margin: 0 auto; padding: 26px 30px 30px;
-  border-radius: 18px;
-  background: radial-gradient(circle at 30% 20%, #3f8f3a, #2b6b2a 60%, #225722);
-  box-shadow: inset 0 -6px 0 rgba(0,0,0,.2);
+/* 7 nor w układzie plastra miodu (2-3-2); pozycje środków podaje --x / --y */
+.moles-field { position: relative; width: 100%; max-width: 560px; aspect-ratio: 1.2; margin: 0 auto; }
+.hole {
+  position: absolute; left: var(--x); top: var(--y); width: 21%; aspect-ratio: 1;
+  transform: translate(-50%, -50%); background: transparent; border: 0; padding: 0; cursor: default;
 }
-.hole { position: relative; aspect-ratio: 1; background: transparent; border: 0; padding: 0; cursor: default; }
 .moles-field.playing .hole { cursor: pointer; }
-.hole::before {
-  content: ''; position: absolute; left: 10%; right: 10%; bottom: 14%; height: 26%;
-  border-radius: 50%; background: radial-gradient(ellipse at 50% 35%, #0f0904 50%, #2b1a0d 80%);
-  box-shadow: 0 0 0 5px #6e4a2c;
+.hole::before, .hole::after { content: ''; position: absolute; border-radius: 50%; transition: box-shadow 0.15s, background 0.15s; }
+.hole::before { inset: 0; background: #2c3e50; box-shadow: 0 6px 0 #1c2a37; }
+.hole::after { inset: 16%; background: #1d2b38; box-shadow: inset 0 6px 10px rgba(0,0,0,.45); }
+@media (hover: hover) {
+  .moles-field.playing .hole:hover::before { background: #37506a; }
 }
-.moles-field.playing .hole:hover::before { box-shadow: 0 0 0 5px #9a6b42; }
-.hole-pit { position: absolute; left: 14%; right: 14%; top: -12%; bottom: 27%; overflow: hidden; }
-.hole-mole { position: absolute; left: 0; right: 0; bottom: 0; transform: translateY(105%); transition: transform 0.22s cubic-bezier(.3,1.4,.6,1); }
-.hole.up .hole-mole { transform: translateY(8%); }
-.mole { width: 100%; }
+.hole.hit::before { box-shadow: 0 0 0 4px var(--green), 0 0 26px rgba(31,220,122,.55); }
+.hole.missed::before { box-shadow: 0 0 0 4px var(--red), 0 0 26px rgba(255,61,94,.55); }
+/* kret wysuwa się z wnętrza nory; dół jest przycinany na wysokości otworu */
+.hole-pit { position: absolute; left: 20%; right: 20%; top: -110%; bottom: 26%; overflow: hidden; z-index: 1; pointer-events: none; }
+.hole-mole { position: absolute; left: 0; right: 0; bottom: 0; transform: translateY(102%); transition: transform 0.24s cubic-bezier(.3,1.45,.6,1); }
+.hole.up .hole-mole { transform: translateY(-12%); }
+.mole { width: 100%; display: block; }
 .mole .stars { opacity: 0; }
-.hole.hit .mole .stars { opacity: 1; animation: spin 0.6s linear infinite; transform-origin: 50% 25%; }
-.hole.hit .mole .eye { transform: scaleY(0.2); transform-origin: center; transform-box: fill-box; }
-.hole.hit::before { box-shadow: 0 0 0 5px var(--green), 0 0 22px var(--green); }
-.hole.missed::before { box-shadow: 0 0 0 5px var(--red), 0 0 22px var(--red); }
+.hole.hit .mole .stars { opacity: 1; animation: spin 0.7s linear infinite; transform-origin: 32px 6px; transform-box: view-box; }
+.hole.hit .mole .eye { transform: scaleY(0.15); transform-origin: center; transform-box: fill-box; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.hammer { position: absolute; width: 58%; right: -6%; top: -10%; opacity: 0; pointer-events: none; transform-origin: 55% 95%; z-index: 3; }
-.hole.swing .hammer { opacity: 1; animation: swing 0.35s ease-in forwards; }
-@keyframes swing { 0% { transform: rotate(40deg); } 60% { transform: rotate(-45deg); } 100% { transform: rotate(-35deg); opacity: 0; } }
-.hole-miss { position: absolute; left: 0; right: 0; bottom: 18%; text-align: center; font-size: 26px; font-weight: 900; color: var(--red); opacity: 0; text-shadow: 0 2px 4px rgba(0,0,0,.6); }
+.hammer {
+  position: absolute; width: 95%; left: -48%; top: -62%; opacity: 0; pointer-events: none; z-index: 3;
+  transform-origin: 85% 85%;
+}
+.hole.swing .hammer { opacity: 1; animation: swing 0.38s ease-in forwards; }
+@keyframes swing { 0% { transform: rotate(-35deg); } 55% { transform: rotate(28deg); } 75% { transform: rotate(22deg); } 100% { transform: rotate(22deg); opacity: 0; } }
+.hole-miss {
+  position: absolute; inset: 0; display: grid; place-items: center; z-index: 2;
+  font-size: clamp(18px, 4vw, 30px); font-weight: 900; color: var(--red); opacity: 0; text-shadow: 0 2px 4px rgba(0,0,0,.6);
+}
 .hole.missed .hole-miss { opacity: 1; animation: popUp 0.25s ease-out; }
+/* kropki postępu rund pod planszą */
+.moles-dots { display: flex; justify-content: center; gap: 7px; margin: 0 auto; padding: 8px 12px; border-radius: 999px; background: var(--panel-2); }
+.moles-dots i { width: 10px; height: 10px; border-radius: 50%; background: #e8eef6; opacity: 0.85; transition: background 0.2s; }
+.moles-dots i.done { background: var(--green); opacity: 1; }
+.moles-dots i.current { background: var(--red); opacity: 1; box-shadow: 0 0 0 3px rgba(255,61,94,.25); }
 
 /* ---------- Limbo ---------- */
 .limbo-stage { justify-content: space-between; }
@@ -543,6 +553,112 @@ svg { display: block; }
 .c3 { background: #1fa85b; }
 .c4 { background: #f08a1c; }
 .c5 { background: #c9a227; color: #2a1c00; }
+
+/* ---------- przełącznik (Extra Bet) ---------- */
+.switch-row { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.switch-row .hint {
+  display: inline-grid; place-items: center; width: 15px; height: 15px; margin-left: 4px; border-radius: 50%;
+  background: var(--panel-3); color: var(--text); font-size: 10px; font-style: italic; cursor: help;
+}
+.switch { position: relative; width: 44px; height: 24px; flex: none; }
+.switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; z-index: 1; }
+.switch-track { position: absolute; inset: 0; border-radius: 999px; background: var(--panel-3); transition: background 0.15s; }
+.switch-track::after {
+  content: ''; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%;
+  background: #fff; transition: transform 0.15s;
+}
+.switch input:checked + .switch-track { background: #3d8bff; }
+.switch input:checked + .switch-track::after { transform: translateX(20px); }
+.switch input:disabled + .switch-track { opacity: 0.5; }
+
+/* Limbo: dwa cele obok siebie */
+.limbo-targets { display: grid; gap: 12px; }
+.limbo-targets.double { grid-template-columns: 1fr 1fr; }
+.limbo-inputs.won { box-shadow: inset 0 0 0 2px var(--green); }
+.limbo-inputs.lost { box-shadow: inset 0 0 0 2px var(--red); }
+
+/* ---------- gry z drabinką mnożników (Flip, KPN) ---------- */
+.ladder-status { text-align: center; font-weight: 700; color: #c4d2e0; min-height: 22px; }
+.mult-ladder { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: auto; }
+.pick-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pick-row.three { grid-template-columns: repeat(3, 1fr); }
+.pick-row .wide { grid-column: 1 / -1; }
+.pick-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; font-size: 13px; }
+.pick-row .wide { flex-direction: row; justify-content: center; }
+.pick-emoji { font-size: 26px; line-height: 1; }
+
+/* ---------- Flip ---------- */
+.flip-stage { gap: 16px; }
+.coin-wrap { position: relative; flex: 1; display: grid; place-items: center; min-height: 240px; perspective: 800px; }
+.coin { position: relative; width: 170px; height: 170px; transform-style: preserve-3d; transition: transform 0.7s cubic-bezier(.3,.9,.4,1); }
+.coin-face {
+  position: absolute; inset: 0; border-radius: 50%; display: grid; place-items: center; backface-visibility: hidden;
+  font-size: 64px; font-weight: 800; color: rgba(0,0,0,.45);
+  box-shadow: inset 0 0 0 10px rgba(255,255,255,.18), inset 0 -10px 20px rgba(0,0,0,.25), 0 12px 30px rgba(0,0,0,.45);
+}
+.coin-face.heads { background: radial-gradient(circle at 35% 30%, #ffe680, #f2b705 70%); }
+.coin-face.tails { background: radial-gradient(circle at 35% 30%, #d6e4f2, #8aa0b7 70%); transform: rotateY(180deg); }
+.coin-mini { display: inline-block; width: 18px; height: 18px; border-radius: 50%; flex: none; }
+.coin-mini.heads { background: #f2b705; }
+.coin-mini.tails { background: #8aa0b7; }
+.coin-mini.bad { box-shadow: 0 0 0 2px var(--red); }
+.flip-trail { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; min-height: 18px; }
+
+/* ---------- Snakes ---------- */
+.snakes-stage { gap: 14px; }
+.snakes-board {
+  position: relative; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr);
+  gap: 8px; width: 100%; max-width: 500px; aspect-ratio: 1; margin: 0 auto;
+}
+.snake-tile {
+  position: relative; border-radius: 10px; background: var(--panel-3); box-shadow: 0 4px 0 #1b2c3d;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-weight: 800;
+  transition: background 0.2s;
+}
+.snake-tile .tile-sum { position: absolute; top: 5px; left: 7px; font-size: 11px; color: var(--muted); }
+.snake-tile .tile-val { font-size: 15px; }
+.snake-tile .tile-val svg { width: 34px; height: 34px; }
+.snake-tile.start { background: #1d3a5c; color: #8fc1ff; }
+.snake-tile.start .tile-val { font-size: 12px; letter-spacing: 1px; }
+.snake-tile.snake { background: #2a1822; box-shadow: 0 4px 0 #1a0f15; }
+.snake-tile.hit { box-shadow: 0 0 0 3px var(--green), 0 0 16px rgba(31,220,122,.5); }
+.snake-tile.snake.hit { box-shadow: 0 0 0 3px var(--red), 0 0 16px rgba(255,61,94,.6); animation: shake 0.35s; }
+.snakes-center { grid-area: 2 / 2 / 4 / 4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+.dice-pair { display: flex; gap: 12px; }
+.dice-pair.rolling .die { animation: dieShake 0.12s infinite; }
+@keyframes dieShake { 50% { transform: rotate(12deg) translateY(-3px); } }
+.die {
+  width: 52px; height: 52px; border-radius: 10px; background: #fff; padding: 7px;
+  display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); box-shadow: 0 4px 0 #b9c6d3;
+}
+.die i { width: 9px; height: 9px; border-radius: 50%; place-self: center; }
+.die i.on { background: #11202e; }
+.snakes-sum { font-size: 22px; font-weight: 800; color: var(--muted); }
+.snakes-token {
+  position: absolute; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; z-index: 2; pointer-events: none;
+  background: radial-gradient(circle at 35% 30%, #fff, #3d8bff 60%); box-shadow: 0 3px 8px rgba(0,0,0,.5);
+  transition: left 0.07s linear, top 0.07s linear;
+}
+.snakes-rolls { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; max-width: 500px; width: 100%; margin: 0 auto; }
+.roll-slot { background: var(--panel-2); border-radius: 8px; padding: 8px 4px; text-align: center; font-weight: 700; font-size: 12.5px; min-height: 34px; }
+.roll-slot.ok { background: #14402b; color: var(--green); }
+.roll-slot.bad { background: #3b1220; color: var(--red); }
+
+/* ---------- Kamień Papier Nożyce ---------- */
+.rps-stage { gap: 16px; }
+.rps-arena { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; gap: 28px; min-height: 240px; }
+.rps-side { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.rps-who { color: var(--muted); font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+.rps-hand {
+  width: 130px; height: 130px; border-radius: 50%; display: grid; place-items: center; font-size: 64px;
+  background: var(--panel-2); box-shadow: inset 0 0 0 3px var(--panel-3); transition: box-shadow 0.2s;
+}
+.rps-vs { font-weight: 800; color: var(--muted); font-size: 18px; }
+.rps-arena.shaking .rps-hand { animation: rpsShake 0.2s ease-in-out 3; }
+@keyframes rpsShake { 50% { transform: translateY(-14px) rotate(-8deg); } }
+.rps-arena.win [data-you], .rps-arena.lose [data-house] { box-shadow: inset 0 0 0 3px var(--green), 0 0 20px rgba(31,220,122,.4); }
+.rps-arena.lose [data-you], .rps-arena.win [data-house] { box-shadow: inset 0 0 0 3px var(--red); }
+.rps-arena.tie .rps-hand { box-shadow: inset 0 0 0 3px var(--yellow); }
 
 /* ---------- Live stats ---------- */
 .ls-window {
@@ -644,7 +760,7 @@ svg { display: block; }
   .panel { order: 2; padding: 12px; gap: 10px; }
   .stage { order: 1; padding: 14px; }
   .panel > .btn-bet, .panel > .btn-random { order: -1; }
-  .panel > .bj-actions { order: -2; }
+  .panel > .bj-actions, .panel > .pick-row { order: -2; }
   .panel > .bj-insurance { order: -3; }
   .bj-table { min-height: 400px; }
   .dice-board { padding: 36px 0 24px; }
@@ -680,7 +796,8 @@ svg { display: block; }
   .moles-ladder { position: relative; display: flex; overflow-x: auto; scrollbar-width: none; scroll-behavior: smooth; }
   .moles-ladder::-webkit-scrollbar { display: none; }
   .rung { flex: 0 0 68px; }
-  .moles-field { padding: 18px; }
+  .moles-field { width: 112%; margin-left: -6%; }
+  .hole { width: 23%; }
   .plinko-stage { padding: 8px 6px 10px; }
   .plinko-wrap { flex-direction: column; align-items: stretch; }
   .plinko-recent {
@@ -744,4 +861,19 @@ svg { display: block; }
   .limbo-display { min-height: 170px; }
   .limbo-number { font-size: 56px; }
   .limbo-inputs { grid-template-columns: 1fr 1fr; padding: 10px; gap: 10px; }
+  .limbo-targets.double { grid-template-columns: 1fr; gap: 8px; }
+  .limbo-display { min-height: 140px; }
+  .coin-wrap, .rps-arena { min-height: 190px; }
+  .coin { width: 130px; height: 130px; }
+  .coin-face { font-size: 48px; }
+  .rps-arena { gap: 14px; }
+  .rps-hand { width: 100px; height: 100px; font-size: 48px; }
+  .mult-ladder { grid-template-columns: repeat(3, 1fr); }
+  .snakes-board { gap: 5px; }
+  .snake-tile .tile-val { font-size: 12px; }
+  .snake-tile .tile-val svg { width: 26px; height: 26px; }
+  .snake-tile .tile-sum { top: 3px; left: 5px; font-size: 10px; }
+  .die { width: 42px; height: 42px; padding: 6px; }
+  .die i { width: 7px; height: 7px; }
+  .roll-slot { font-size: 11px; padding: 7px 2px; }
 }

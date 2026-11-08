@@ -14,7 +14,7 @@
   // dolny pasek nawigacji na telefonach
   const bottomNav = $('#bottomNav');
   bottomNav.appendChild(el(`<a class="bn-item" href="#/" data-route="">${HOME}<span>Lobby</span></a>`));
-  games.forEach((g) => bottomNav.appendChild(el(`<a class="bn-item" href="#/${g.id}" data-route="${g.id}" style="--accent:${g.accent}">${g.icon}<span>${g.name}</span></a>`)));
+  games.forEach((g) => bottomNav.appendChild(el(`<a class="bn-item" href="#/${g.id}" data-route="${g.id}" style="--accent:${g.accent}">${g.icon}<span>${g.short || g.name}</span></a>`)));
 
   // ---------- strony ----------
   const view = $('#view');

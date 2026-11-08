@@ -123,32 +123,12 @@
     emit('stats');
   }
 
-  // ---------- tabele wypłat ----------
+  // dwumian Newtona (przydatny do liczenia szans w tabelach wypłat)
   function comb(n, k) {
     if (k < 0 || k > n) return 0;
     let r = 1;
     for (let i = 1; i <= k; i++) r = (r * (n - k + i)) / i;
     return r;
-  }
-  function niceRound(x) {
-    if (x >= 100) return Math.round(x);
-    if (x >= 10) return Math.round(x * 10) / 10;
-    return Math.round(x * 100) / 100;
-  }
-  // Mnożnik rośnie wraz z rzadkością wyniku: m(i) = c * p(i)^-g, skalowane do zadanego RTP.
-  // g steruje ryzykiem (większe g = bardziej "płaskie" niskie wypłaty i wyższe maksima).
-  // Powyżej progu `soft` mnożniki rosną logarytmicznie, `cap` to twardy limit.
-  function rarityTable(probs, { g, eligible = () => true, cap = Infinity, soft = Infinity, rtp = 1 - C.houseEdge }) {
-    const f = probs.map((p, i) => (eligible(i) && p > 0 ? Math.pow(p, -g) : 0));
-    const shape = (x) => Math.min(cap, x <= soft ? x : soft * (1 + Math.log(x / soft)));
-    const ev = (c) => probs.reduce((s, p, i) => s + p * shape(c * f[i]), 0);
-    let lo = 0, hi = 1;
-    while (ev(hi) < rtp && hi < 1e12) hi *= 2;
-    for (let i = 0; i < 80; i++) {
-      const mid = (lo + hi) / 2;
-      if (ev(mid) < rtp) lo = mid; else hi = mid;
-    }
-    return f.map((v) => (v ? niceRound(shape(hi * v)) : 0));
   }
 
   // Krótka wibracja na telefonach (ignorowana tam, gdzie nie jest obsługiwana)
@@ -406,7 +386,7 @@
     recordBet, resetStats,
     get stats() { return stats; },
     history,
-    comb, rarityTable, niceRound,
+    comb,
     toast, haptic,
     ui: { field, selectField, betControl, modeTabs, autobet, winPopup, recentBar, gameLayout },
     games,
